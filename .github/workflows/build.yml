@@ -1,27 +1,41 @@
-name: Java CI with Gradle
+name: Build AutoSleep Mod
 
 on:
   push:
-    branches: [ "main", "0aa2978" ]
+    branches: [ "**" ] # Запускать на любой ветке
   pull_request:
-    branches: [ "main" ]
+    branches: [ "**" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Скачать все ветки сразу
+
     - name: Set up JDK 8
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '8'
         distribution: 'temurin'
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+
+    # Эта магия найдет gradlew, даже если он потерялся
+    - name: Fix permissions and check files
+      run: |
+        find . -name "gradlew" -exec chmod +x {} \;
+        echo "Searching for build.gradle..."
+        find . -name "build.gradle"
+
     - name: Build with Gradle
-      run: gradle build
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      run: |
+        # Ищем где лежит gradlew и запускаем его там
+        GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+        cd $(dirname $GRADLEW_PATH)
+        ./gradlew build --no-daemon
+
+    - name: Upload Result
+      uses: actions/upload-artifact@v4
       with:
-        name: AutoSleep-Mod
-        path: build/libs/*.jar
+        name: AutoSleep-Final-Jar
+        path: "**/build/libs/*.jar"
