@@ -1,0 +1,12 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="MIT"
+
+[[mods]]
+modId="autosleep"
+version="${file.jarVersion}"
+displayName="Auto Sleep"
+authors="Codex"
+description='''
+Клиентский мод для автоматического сна ночью на ближайшей или выбранной кровати.
+'''
